@@ -8,6 +8,7 @@ import json
 import time
 import urllib, urllib2
 import win32gui,win32con,win32api
+from PIL import Image
 
 STORE_DIR = 'E:/BingPic/'
 
@@ -32,15 +33,25 @@ class BingPic(object):
             pic_name = STORE_DIR + time.strftime('%Y-%m-%d', time.localtime()) + '.%s' % type
             print u'准备下载：'+url
             urllib.urlretrieve(url, pic_name)
-            print u'保存 %s 在当前路径下！' % pic_name
-            return pic_name
+
+            bmpImage = Image.open(pic_name)
+            newPath = pic_name.replace('jpg', 'bmp')
+            bmpImage.save(newPath, "BMP")
+            print u'保存 %s 在当前路径下！' % newPath
+            return newPath
         else:
             print ulr + '不是一个正确的图片地址'
             return -1
 
     def SetWallpaper(self, image_path):
         """设置背景"""
-        k = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER,"Control Panel\\\\Desktop",0,win32con.KEY_SET_VALUE)
+        print image_path
+        # k = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER,"Control Panel\\\\Desktop",0,win32con.KEY_SET_VALUE)
+        # win32api.RegSetValueEx(k, "WallpaperStyle", 0, win32con.REG_SZ, "2") #2拉伸适应桌面,0桌面居中
+        # win32api.RegSetValueEx(k, "TileWallpaper", 0, win32con.REG_SZ, "0")
+        # a = win32gui.SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER, image_path, 1+2)
+
+        k = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER,"Control Panel\\Desktop",0,win32con.KEY_SET_VALUE)
         win32api.RegSetValueEx(k, "WallpaperStyle", 0, win32con.REG_SZ, "2") #2拉伸适应桌面,0桌面居中
         win32api.RegSetValueEx(k, "TileWallpaper", 0, win32con.REG_SZ, "0")
         win32gui.SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER,image_path, 1+2)
